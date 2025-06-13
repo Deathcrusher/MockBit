@@ -12,10 +12,6 @@
 ### Kompilierte Version
 
 - Installiere `pyinstaller` und die oben genannten Bibliotheken auf der Build-Maschine.
-<<<<<<< ctlh1p-codex/untersuchung-der-verschlüsselungslogik
-- Führe `make` aus, um eigenständige Binaries zu erzeugen.
-- Die entstandenen Dateien `encrypt` und `decrypt` liegen anschließend im Verzeichnis `bin/` und lassen sich ohne weitere Python-Abhängigkeiten nutzen.
-  Der Befehl `make clean` entfernt alle Build-Dateien wieder.
 - Führe `./compile.sh` aus, um eigenständige Binaries zu erzeugen.
 - Die entstandenen Dateien liegen anschließend im Verzeichnis `bin/` und lassen sich ohne weitere Python-Abhängigkeiten nutzen.
 
@@ -40,7 +36,6 @@
 
 - Passe `START_PATH` in `decrypt_all.py` auf das Verzeichnis mit den `.mock`-Dateien an.
 - Stelle sicher, dass `MOCKBIT_KEY.txt` dort liegt und gib dieselbe Passphrase ein.
-- Trage den beim Verschlüsseln erhaltenen Schlüssel (BASE64) bei `KEY_B64` ein.
 - Starte das Skript:
   ```
   python3 decrypt_all.py
