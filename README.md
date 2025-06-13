@@ -13,8 +13,14 @@
   pip3 install -r requirements.txt
   ```
 
+
 ### Compiled Version
 ### Kompilierte Version
+=======
+- Installiere `pyinstaller` und die oben genannten Bibliotheken auf der Build-Maschine.
+- Führe `./compile.sh` aus, um eigenständige Binaries zu erzeugen.
+- Die entstandenen Dateien liegen anschließend im Verzeichnis `bin/` und lassen sich ohne weitere Python-Abhängigkeiten nutzen.
+
 
 - `make` builds standalone binaries in the `bin/` directory.
 - The script `compile.sh` installs dependencies and then calls `make`.
@@ -47,9 +53,14 @@
 ### 2. Decrypt
 ### 2. Entschl\xC3\xBCsseln
 
+
 - Adjust `START_PATH` in `decrypt_all.py` to the directory with the `.mock` files.
 - Make sure `MOCKBIT_KEY.txt` is present and enter the same passphrase.
 - Run the script:
+
+- Passe `START_PATH` in `decrypt_all.py` auf das Verzeichnis mit den `.mock`-Dateien an.
+- Stelle sicher, dass `MOCKBIT_KEY.txt` dort liegt und gib dieselbe Passphrase ein.
+- Starte das Skript:
   ```
   python3 decrypt_all.py
   ```
