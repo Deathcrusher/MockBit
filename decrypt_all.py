@@ -2,16 +2,34 @@ import os
 import json
 import base64
 import getpass
+import argparse
 from Crypto.Cipher import AES
 from argon2.low_level import hash_secret_raw, Type
 
-# Zielordner anpassen!
+# Default options
 START_PATH = "folder"
 KEY_FILENAME = "MOCKBIT_KEY.txt"
 NONCE_SIZE = 12  # Muss identisch zum Wert in encrypt_all.py sein
 ARGON2_TIME = 2
 ARGON2_MEMORY = 102400
 ARGON2_PARALLELISM = 8
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Decrypt all .mock files in a folder recursively"
+    )
+    parser.add_argument(
+        "--path",
+        default=START_PATH,
+        help="Target directory (default: %(default)s)",
+    )
+    parser.add_argument("--time", type=int, help="Override Argon2 time cost")
+    parser.add_argument("--memory", type=int, help="Override Argon2 memory cost")
+    parser.add_argument(
+        "--parallelism", type=int, help="Override Argon2 degree of parallelism"
+    )
+    return parser.parse_args()
 
 def decrypt_file(file_path, key):
     try:
@@ -54,7 +72,9 @@ def find_and_decrypt_all_files(path, key):
                 decrypt_file(file_path, key)
 
 if __name__ == "__main__":
-    key_path = os.path.join(START_PATH, KEY_FILENAME)
+    args = parse_args()
+
+    key_path = os.path.join(args.path, KEY_FILENAME)
     if not os.path.exists(key_path):
         print("Key-Datei nicht gefunden:", key_path)
         exit(1)
@@ -70,6 +90,13 @@ if __name__ == "__main__":
         print("Key-Datei ungültig:", e)
         exit(1)
 
+    if args.time is not None:
+        time_cost = args.time
+    if args.memory is not None:
+        mem_cost = args.memory
+    if args.parallelism is not None:
+        parallel = args.parallelism
+
     passphrase = getpass.getpass("Bitte Passphrase zum Entschlüsseln eingeben:\n")
     key = hash_secret_raw(
         secret=passphrase.encode(),
@@ -81,6 +108,6 @@ if __name__ == "__main__":
         type=Type.ID,
     )
 
-    print(f"Starte Entschlüsselung in: {START_PATH}")
-    find_and_decrypt_all_files(START_PATH, key)
+    print(f"Starte Entschlüsselung in: {args.path}")
+    find_and_decrypt_all_files(args.path, key)
     print("Fertig.")
