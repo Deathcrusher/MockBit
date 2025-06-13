@@ -1,11 +1,10 @@
 # Simple AES File Encrypt/Decrypt Scripts
-# Einfache AES-Datei Verschl\xC3\xBCsselungs-/Entschl\xC3\xBCsselungsskripte
+
+## English
 
 **Encrypt and decrypt all files in a folder (including subfolders) with AES-256-GCM.**
-**Verschl\xC3\xBCssle und entschl\xC3\xBCssle alle Dateien in einem Ordner (inkl. Unterordner) mit AES-256-GCM.**
 
-## Requirements
-## Voraussetzungen
+### Requirements
 
 - Python 3.x
 - Install [PyCryptodome](https://www.pycryptodome.org/) and [argon2-cffi](https://pypi.org/project/argon2-cffi/):
@@ -13,19 +12,74 @@
   pip3 install -r requirements.txt
   ```
 
+- Run either
+### Usage
+#### 1. Encrypt
+#### 2. Decrypt
 
-### Compiled Version
-### Kompilierte Version
-=======
-- Installiere `pyinstaller` und die oben genannten Bibliotheken auf der Build-Maschine.
-- Führe `./compile.sh` aus, um eigenständige Binaries zu erzeugen.
-- Die entstandenen Dateien liegen anschließend im Verzeichnis `bin/` und lassen sich ohne weitere Python-Abhängigkeiten nutzen.
+### Notes
+### Disclaimer
 
+## Deutsch
 
-- `make` builds standalone binaries in the `bin/` directory.
-- The script `compile.sh` installs dependencies and then calls `make`.
-- So run either
+**Verschl\xC3\xBCssle und entschl\xC3\xBCssle alle Dateien in einem Ordner (inkl. Unterordner) mit AES-256-GCM.**
+
+### Voraussetzungen
+
+- Python 3.x
+- [PyCryptodome](https://www.pycryptodome.org/) und [argon2-cffi](https://pypi.org/project/argon2-cffi/) installieren:
   ```
+  pip3 install -r requirements.txt
+  ```
+
+### Kompilierte Version
+
+- `make` erzeugt eigenst\xC3\xA4ndige Binaries im Verzeichnis `bin/`.
+- Das Skript `compile.sh` installiert die Abh\xC3\xA4ngigkeiten und ruft danach `make` auf.
+- F\xC3\xBChre also entweder
+  ```
+  make
+  ```
+  oder
+  ```
+  ./compile.sh
+  ```
+  aus.
+- Danach findest du die Ausf\xC3\xBChrbaren Dateien in `bin/`. Mit `make clean` werden die Build-Dateien entfernt.
+
+### Verwendung
+
+#### 1. Verschl\xC3\xBCsseln
+
+- Passe `START_PATH` in `encrypt_all.py` an dein Zielverzeichnis an.
+- Starte das Skript und gib eine Passphrase ein:
+  ```
+  python3 encrypt_all.py
+  ```
+- Die Passphrase wird mittels Argon2id in einen Schl\xC3\xBCssel abgeleitet.
+- Parameter wie Salz und Zeit-/Speicherkosten werden in `MOCKBIT_KEY.txt` gespeichert.
+- Alle Dateien werden als `.mock` verschl\xC3\xBCsselt, die Originale werden sicher gel\xC3\xB6scht.
+- Der erzeugte BASE64-Schl\xC3\xBCssel wird angezeigt – **unbedingt sichern!**
+
+#### 2. Entschl\xC3\xBCsseln
+
+- Passe `START_PATH` in `decrypt_all.py` an das Verzeichnis mit den `.mock`-Dateien an.
+- Stelle sicher, dass `MOCKBIT_KEY.txt` vorhanden ist und gib dieselbe Passphrase ein.
+- Starte das Skript:
+  ```
+  python3 decrypt_all.py
+  ```
+- Die Dateien werden wiederhergestellt, `.mock`-Dateien werden entfernt.
+
+### Hinweise
+
+- **Unbedingt zuerst in einer Testumgebung ausprobieren!**
+- Ohne den Schl\xC3\xBCssel kann niemand die Daten wiederherstellen.
+- Beim Entschl\xC3\xBCsseln werden vorhandene Dateien nicht \xC3\xBCberschrieben; sie erhalten ihren urspr\xC3\xBCnglichen Namen zur\xC3\xBCck.
+- F\xC3\xBCr Backups oder produktiven Einsatz bitte weiterentwickeln!
+
+### Haftungsausschluss
+
   make
   ```
   or
