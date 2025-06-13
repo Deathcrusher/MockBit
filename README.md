@@ -12,8 +12,9 @@
 ### Kompilierte Version
 
 - Installiere `pyinstaller` und die oben genannten Bibliotheken auf der Build-Maschine.
-- Führe `./compile.sh` aus, um eigenständige Binaries zu erzeugen.
-- Die entstandenen Dateien liegen anschließend im Verzeichnis `bin/` und lassen sich ohne weitere Python-Abhängigkeiten nutzen.
+- Führe `make` aus, um eigenständige Binaries zu erzeugen.
+- Die entstandenen Dateien `encrypt` und `decrypt` liegen anschließend im Verzeichnis `bin/` und lassen sich ohne weitere Python-Abhängigkeiten nutzen.
+  Der Befehl `make clean` entfernt alle Build-Dateien wieder.
 
  
 
