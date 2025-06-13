@@ -37,8 +37,8 @@ Run `make clean` to remove build artefacts.
 
 | Step | Action | Command / Notes |
 |------|--------|-----------------|
-| 1 | **Encrypt** | Adjust `START_PATH` in `encrypt_all.py`, then:<br>`python3 encrypt_all.py`<br>Enter passphrase → key derived via Argon2id<br>Salt & Argon2 params saved to **MOCKBIT_KEY.txt**<br>Original files deleted, encrypted copies end with **.mock**<br>The **base64 key** is printed – **save it!** |
-| 2 | **Decrypt** | Adjust `START_PATH` in `decrypt_all.py`, ensure **MOCKBIT_KEY.txt** is present, then:<br>`python3 decrypt_all.py`<br>Enter the same passphrase → files are restored, `.mock` files removed |
+| 1 | **Encrypt** | `python3 encrypt_all.py --path folder` (add `--time`, `--memory`, `--parallelism` if needed)<br>Enter passphrase → key derived via Argon2id<br>Salt & Argon2 params saved to **MOCKBIT_KEY.txt**<br>Original files deleted, encrypted copies end with **.mock** |
+| 2 | **Decrypt** | `python3 decrypt_all.py --path folder` (same optional parameters)<br>Enter the same passphrase → files are restored, `.mock` files removed |
 
 ### Notes
 * **Always test in a safe environment first.**
@@ -85,8 +85,8 @@ Mit `make clean` entfernst du die Build-Dateien.
 
 | Schritt | Aktion | Befehl / Hinweise |
 |---------|--------|-------------------|
-| 1 | **Verschlüsseln** | `START_PATH` in `encrypt_all.py` anpassen, dann:<br>`python3 encrypt_all.py`<br>Passphrase eingeben → Schlüssel wird via Argon2id abgeleitet<br>Salz & Argon2‑Parameter in **MOCKBIT_KEY.txt**<br>Originale werden sicher gelöscht, verschlüsselte Dateien enden auf **.mock**<br>Der **Base64‑Schlüssel** wird angezeigt – **unbedingt aufbewahren!** |
-| 2 | **Entschlüsseln** | `START_PATH` in `decrypt_all.py` anpassen, sicherstellen, dass **MOCKBIT_KEY.txt** vorhanden ist, dann:<br>`python3 decrypt_all.py`<br>Dieselbe Passphrase eingeben → Dateien werden wiederhergestellt, `.mock`‑Dateien entfernt |
+| 1 | **Verschlüsseln** | `python3 encrypt_all.py --path ordner` (optional `--time`, `--memory`, `--parallelism`)<br>Passphrase eingeben → Schlüssel wird via Argon2id abgeleitet<br>Salz & Argon2‑Parameter in **MOCKBIT_KEY.txt**<br>Originale werden sicher gelöscht, verschlüsselte Dateien enden auf **.mock** |
+| 2 | **Entschlüsseln** | `python3 decrypt_all.py --path ordner` (gleiche optionale Parameter)<br>Dieselbe Passphrase eingeben → Dateien werden wiederhergestellt, `.mock`‑Dateien entfernt |
 
 ### Hinweise
 * **Unbedingt zuerst in einer Testumgebung ausprobieren.**
