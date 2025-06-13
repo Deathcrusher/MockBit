@@ -24,6 +24,8 @@ def encrypt_file(file_path, key):
     with open(file_path + ".mock", "wb") as f:
         f.write(nonce + tag + ct_bytes)
     secure_delete(file_path)
+
+
 def secure_delete(path):
     """Overwrite the file with random bytes before removing it."""
     try:
@@ -39,22 +41,6 @@ def secure_delete(path):
             os.remove(path)
         except Exception:
             pass
-def secure_delete(path):
-    """Overwrite the file with random bytes before removing it."""
-    try:
-        length = os.path.getsize(path)
-        with open(path, "wb") as f:
-            f.write(get_random_bytes(length))
-            f.flush()
-            os.fsync(f.fileno())
-    except Exception as e:
-        print("Sicheres Löschen fehlgeschlagen für", path, e)
-    finally:
-        try:
-            os.remove(path)
-        except Exception:
-            pass
-    os.remove(file_path)
 def find_and_encrypt_all_files(path, key):
     for dirpath, _, files in os.walk(path):
         for name in files:
