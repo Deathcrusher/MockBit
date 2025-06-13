@@ -15,17 +15,18 @@
 ### 1. Verschlüsseln
 
 - Passe `START_PATH` in `encrypt_all.py` auf dein Zielverzeichnis an.
-- Starte das Skript:
+- Starte das Skript und gib eine Passphrase ein:
   ```
   python3 encrypt_all.py
   ```
-- Der erzeugte BASE64-Schlüssel wird angezeigt – **unbedingt sichern!**
-- Alle Dateien werden als `.mock` verschlüsselt, Originaldateien werden gelöscht.
+- Die Passphrase wird mittels PBKDF2 in einen Schlüssel abgeleitet.
+- Parameter wie Salz und Iterationen werden in `MOCKBIT_KEY.txt` gespeichert.
+- Alle Dateien werden als `.mock` verschlüsselt, Originaldateien werden sicher gelöscht.
 
 ### 2. Entschlüsseln
 
 - Passe `START_PATH` in `decrypt_all.py` auf das Verzeichnis mit den `.mock`-Dateien an.
-- Trage den beim Verschlüsseln erhaltenen Schlüssel (BASE64) bei `KEY_B64` ein.
+- Stelle sicher, dass `MOCKBIT_KEY.txt` dort liegt und gib dieselbe Passphrase ein.
 - Starte das Skript:
   ```
   python3 decrypt_all.py

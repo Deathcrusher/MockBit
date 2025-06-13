@@ -1,10 +1,15 @@
 import os
+import json
 import base64
+import getpass
 from Crypto.Cipher import AES
+from Crypto.Protocol.KDF import PBKDF2
 
 # Zielordner anpassen!
-START_PATH = "/folder"
+START_PATH = "folder"
+KEY_FILENAME = "MOCKBIT_KEY.txt"
 NONCE_SIZE = 12  # Muss identisch zum Wert in encrypt_all.py sein
+PBKDF2_ITERATIONS = 200_000
 
 
 
@@ -49,14 +54,23 @@ def find_and_decrypt_all_files(path, key):
                 decrypt_file(file_path, key)
 
 if __name__ == "__main__":
-    key_b64 = input("Bitte gib den Schlüssel (BASE64) zum Entschlüsseln ein:\n").strip()
-    try:
-        key = base64.b64decode(key_b64)
-        if len(key) != 32:
-            raise ValueError("Falsche Schlüssellänge!")
-    except Exception as e:
-        print("Ungültiger Schlüssel! Fehler:", e)
+    key_path = os.path.join(START_PATH, KEY_FILENAME)
+    if not os.path.exists(key_path):
+        print("Key-Datei nicht gefunden:", key_path)
         exit(1)
+
+    with open(key_path, "r") as f:
+        info = json.load(f)
+    try:
+        salt = base64.b64decode(info["salt"])
+        iterations = int(info.get("iterations", PBKDF2_ITERATIONS))
+    except Exception as e:
+        print("Key-Datei ungültig:", e)
+        exit(1)
+
+    passphrase = getpass.getpass("Bitte Passphrase zum Entschlüsseln eingeben:\n")
+    key = PBKDF2(passphrase, salt, dkLen=32, count=iterations)
+
     print(f"Starte Entschlüsselung in: {START_PATH}")
     find_and_decrypt_all_files(START_PATH, key)
     print("Fertig.")
