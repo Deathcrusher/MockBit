@@ -12,9 +12,14 @@
 ### Kompilierte Version
 
 - Installiere `pyinstaller` und die oben genannten Bibliotheken auf der Build-Maschine.
+<<<<<<< ctlh1p-codex/untersuchung-der-verschlüsselungslogik
 - Führe `make` aus, um eigenständige Binaries zu erzeugen.
 - Die entstandenen Dateien `encrypt` und `decrypt` liegen anschließend im Verzeichnis `bin/` und lassen sich ohne weitere Python-Abhängigkeiten nutzen.
   Der Befehl `make clean` entfernt alle Build-Dateien wieder.
+=======
+- Führe `./compile.sh` aus, um eigenständige Binaries zu erzeugen.
+- Die entstandenen Dateien liegen anschließend im Verzeichnis `bin/` und lassen sich ohne weitere Python-Abhängigkeiten nutzen.
+>>>>>>> main
 
  
 
@@ -30,11 +35,21 @@
 - Die Passphrase wird mittels Argon2id in einen Schlüssel abgeleitet.
 - Parameter wie Salz und Zeit- und Speicherkosten werden in `MOCKBIT_KEY.txt` gespeichert.
 - Alle Dateien werden als `.mock` verschlüsselt, Originaldateien werden sicher gelöscht.
+<<<<<<< ctlh1p-codex/untersuchung-der-verschlüsselungslogik
+=======
+- Der erzeugte BASE64-Schlüssel wird angezeigt – **unbedingt sichern!**
+- Alle Dateien werden als `.mock` verschlüsselt, Originaldateien werden gelöscht.
+>>>>>>> main
 
 ### 2. Entschlüsseln
 
 - Passe `START_PATH` in `decrypt_all.py` auf das Verzeichnis mit den `.mock`-Dateien an.
 - Stelle sicher, dass `MOCKBIT_KEY.txt` dort liegt und gib dieselbe Passphrase ein.
+<<<<<<< ctlh1p-codex/untersuchung-der-verschlüsselungslogik
+=======
+=======
+- Trage den beim Verschlüsseln erhaltenen Schlüssel (BASE64) bei `KEY_B64` ein.
+>>>>>>> main
 - Starte das Skript:
   ```
   python3 decrypt_all.py
