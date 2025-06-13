@@ -11,9 +11,14 @@
   ```
 ### Kompilierte Version
 
-- Installiere `pyinstaller` und die oben genannten Bibliotheken auf der Build-Maschine.
-- Führe `./compile.sh` aus, um eigenständige Binaries zu erzeugen.
-- Die entstandenen Dateien liegen anschließend im Verzeichnis `bin/` und lassen sich ohne weitere Python-Abhängigkeiten nutzen.
+- Das Skript `compile.sh` installiert automatisch PyInstaller sowie alle
+  Pakete aus `requirements.txt`.
+- Starte einfach:
+  ```
+  ./compile.sh
+  ```
+- Danach findest du die ausführbaren Dateien im Verzeichnis `bin/`. Sie
+  benötigen keine Python-Installation mehr.
 
  
 
