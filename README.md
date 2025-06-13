@@ -1,6 +1,6 @@
 # Simple AES File Encrypt/Decrypt Scripts
 
-**Verschlüssle und entschlüssele alle Dateien in einem Ordner (inkl. Unterordner) mit AES-256.**
+**Verschlüssle und entschlüssele alle Dateien in einem Ordner (inkl. Unterordner) mit AES-256-GCM.**
 
 ## Voraussetzungen
 
@@ -20,17 +20,17 @@
   python3 encrypt_all.py
   ```
 - Der erzeugte BASE64-Schlüssel wird angezeigt – **unbedingt sichern!**
-- Alle Dateien werden als `.enc` verschlüsselt, Originaldateien werden gelöscht.
+- Alle Dateien werden als `.mock` verschlüsselt, Originaldateien werden gelöscht.
 
 ### 2. Entschlüsseln
 
-- Passe `START_PATH` in `decrypt_all.py` auf das Verzeichnis mit den `.enc`-Dateien an.
+- Passe `START_PATH` in `decrypt_all.py` auf das Verzeichnis mit den `.mock`-Dateien an.
 - Trage den beim Verschlüsseln erhaltenen Schlüssel (BASE64) bei `KEY_B64` ein.
 - Starte das Skript:
   ```
   python3 decrypt_all.py
   ```
-- Die Dateien werden wiederhergestellt, `.enc`-Dateien werden gelöscht.
+- Die Dateien werden wiederhergestellt, `.mock`-Dateien werden gelöscht.
 
 ## Hinweise
 

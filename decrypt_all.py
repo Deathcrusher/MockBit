@@ -4,25 +4,28 @@ from Crypto.Cipher import AES
 
 # Zielordner anpassen!
 START_PATH = "/folder"
+NONCE_SIZE = 12  # Muss identisch zum Wert in encrypt_all.py sein
 
-def unpad(data):
-    pad_length = data[-1]
-    return data[:-pad_length]
+
 
 def decrypt_file(file_path, key):
     try:
-        if os.path.getsize(file_path) < 17:
+        if os.path.getsize(file_path) < NONCE_SIZE + 16:
             print("Überspringe zu kleine Datei:", file_path)
             return
         with open(file_path, "rb") as f:
-            iv = f.read(16)
+            nonce = f.read(NONCE_SIZE)
+            tag = f.read(16)
             ct = f.read()
-        if len(iv) != 16:
-            print("Ungültiger IV in Datei:", file_path)
+        if len(nonce) != NONCE_SIZE:
+            print("Ungültiger Nonce in Datei:", file_path)
             return
-        cipher = AES.new(key, AES.MODE_CBC, iv)
-        data = cipher.decrypt(ct)
-        data = unpad(data)
+        cipher = AES.new(key, AES.MODE_GCM, nonce=nonce)
+        try:
+            data = cipher.decrypt_and_verify(ct, tag)
+        except ValueError:
+            print("Authentifizierung fehlgeschlagen für:", file_path)
+            return
 
         # Hier wird .mock sauber entfernt:
         base, ext = os.path.splitext(file_path)
