@@ -12,8 +12,11 @@ NONCE_SIZE = 12  # Muss identisch zum Wert in encrypt_all.py sein
 ARGON2_TIME = 2
 ARGON2_MEMORY = 102400
 ARGON2_PARALLELISM = 8
+<<<<<<< ctlh1p-codex/untersuchung-der-verschlüsselungslogik
+=======
 START_PATH = "/folder"
 NONCE_SIZE = 12  # Muss identisch zum Wert in encrypt_all.py sein
+>>>>>>> main
 
 
 
