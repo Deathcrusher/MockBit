@@ -1,8 +1,17 @@
 import os
+import json
 import base64
+import getpass
 from Crypto.Cipher import AES
+from argon2.low_level import hash_secret_raw, Type
 
 # Zielordner anpassen!
+START_PATH = "folder"
+KEY_FILENAME = "MOCKBIT_KEY.txt"
+NONCE_SIZE = 12  # Muss identisch zum Wert in encrypt_all.py sein
+ARGON2_TIME = 2
+ARGON2_MEMORY = 102400
+ARGON2_PARALLELISM = 8
 START_PATH = "/folder"
 NONCE_SIZE = 12  # Muss identisch zum Wert in encrypt_all.py sein
 
@@ -49,14 +58,33 @@ def find_and_decrypt_all_files(path, key):
                 decrypt_file(file_path, key)
 
 if __name__ == "__main__":
-    key_b64 = input("Bitte gib den Schlüssel (BASE64) zum Entschlüsseln ein:\n").strip()
-    try:
-        key = base64.b64decode(key_b64)
-        if len(key) != 32:
-            raise ValueError("Falsche Schlüssellänge!")
-    except Exception as e:
-        print("Ungültiger Schlüssel! Fehler:", e)
+    key_path = os.path.join(START_PATH, KEY_FILENAME)
+    if not os.path.exists(key_path):
+        print("Key-Datei nicht gefunden:", key_path)
         exit(1)
+
+    with open(key_path, "r") as f:
+        info = json.load(f)
+    try:
+        salt = base64.b64decode(info["salt"])
+        time_cost = int(info.get("time", ARGON2_TIME))
+        mem_cost = int(info.get("memory", ARGON2_MEMORY))
+        parallel = int(info.get("parallelism", ARGON2_PARALLELISM))
+    except Exception as e:
+        print("Key-Datei ungültig:", e)
+        exit(1)
+
+    passphrase = getpass.getpass("Bitte Passphrase zum Entschlüsseln eingeben:\n")
+    key = hash_secret_raw(
+        secret=passphrase.encode(),
+        salt=salt,
+        time_cost=time_cost,
+        memory_cost=mem_cost,
+        parallelism=parallel,
+        hash_len=32,
+        type=Type.ID,
+    )
+
     print(f"Starte Entschlüsselung in: {START_PATH}")
     find_and_decrypt_all_files(START_PATH, key)
     print("Fertig.")
