@@ -26,6 +26,10 @@ make          # just build
 ./compile.sh  # install deps & build
 ```
 
+`compile.sh` creates `~/tmp` and sets `TMPDIR` automatically so the build works
+on systems where `/tmp` is mounted with `noexec`. If you run the scripts
+directly, export `TMPDIR=$HOME/tmp` yourself.
+
 The binaries are placed in **bin/**.  
 Run `make clean` to remove build artefacts.
 
@@ -69,6 +73,10 @@ pip3 install -r requirements.txt
 make          # nur bauen
 ./compile.sh  # Abhängigkeiten installieren und bauen
 ```
+
+`compile.sh` legt automatisch `~/tmp` an und setzt `TMPDIR`, falls `/tmp` mit
+`noexec` eingehängt ist. Wenn du die Skripte direkt aufrufst, setze
+`TMPDIR=$HOME/tmp` selbst.
 
 Die Binaries liegen anschließend in **bin/**.  
 Mit `make clean` entfernst du die Build-Dateien.
