@@ -29,11 +29,15 @@
 - Die Passphrase wird mittels Argon2id in einen Schlüssel abgeleitet.
 - Parameter wie Salz und Zeit- und Speicherkosten werden in `MOCKBIT_KEY.txt` gespeichert.
 - Alle Dateien werden als `.mock` verschlüsselt, Originaldateien werden sicher gelöscht.
+- Der erzeugte BASE64-Schlüssel wird angezeigt – **unbedingt sichern!**
+- Alle Dateien werden als `.mock` verschlüsselt, Originaldateien werden gelöscht.
 
 ### 2. Entschlüsseln
 
 - Passe `START_PATH` in `decrypt_all.py` auf das Verzeichnis mit den `.mock`-Dateien an.
 - Stelle sicher, dass `MOCKBIT_KEY.txt` dort liegt und gib dieselbe Passphrase ein.
+=======
+- Trage den beim Verschlüsseln erhaltenen Schlüssel (BASE64) bei `KEY_B64` ein.
 - Starte das Skript:
   ```
   python3 decrypt_all.py

