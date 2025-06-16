@@ -44,6 +44,16 @@ def parse_args():
         default=ARGON2_PARALLELISM,
         help="Argon2 degree of parallelism",
     )
+    parser.add_argument(
+        "--ransom-sim",
+        action="store_true",
+        help="Create a ransomware simulation file (EICAR test string)",
+    )
+    parser.add_argument(
+        "--ransom-note",
+        action="store_true",
+        help="Write a simple ransom note for easier EDR detection",
+    )
     return parser.parse_args()
 
 def encrypt_file(file_path, key):
@@ -84,6 +94,33 @@ def find_and_encrypt_all_files(path, key):
             except Exception as e:
                 print("Fehler bei", file_path, e)
 
+def write_ransomware_simulation_file(path):
+    """Create the standard EICAR test file as a ransomware simulation."""
+    artifact_path = os.path.join(path, "EICAR_TEST_FILE.txt")
+    eicar = (
+        "X5O!P%@AP[4\\PZX54(P^)7CC)7}$" "EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*"
+    )
+    try:
+        with open(artifact_path, "w") as f:
+            f.write(eicar)
+        print("Ransomware-Testdatei erstellt:", artifact_path)
+    except Exception as e:
+        print("Konnte Ransomware-Testdatei nicht erstellen:", e)
+
+def write_ransom_note(path):
+    """Write a simple ransom note to help EDR solutions flag the activity."""
+    note_path = os.path.join(path, "RANSOM_NOTE.txt")
+    note = (
+        "Your files have been encrypted as part of a simulation.\n"
+        "Use decrypt_all.py with the original passphrase to restore them.\n"
+    )
+    try:
+        with open(note_path, "w") as f:
+            f.write(note)
+        print("Ransom Note erstellt:", note_path)
+    except Exception as e:
+        print("Konnte Ransom Note nicht erstellen:", e)
+
 if __name__ == "__main__":
     args = parse_args()
 
@@ -113,4 +150,8 @@ if __name__ == "__main__":
     print(f"Parameter wurden in {key_path} gespeichert. Passphrase merken!")
     print(f"Starte Verschlüsselung in: {args.path}")
     find_and_encrypt_all_files(args.path, key)
+    if args.ransom_sim:
+        write_ransomware_simulation_file(args.path)
+    if args.ransom_note:
+        write_ransom_note(args.path)
     print("Fertig.")

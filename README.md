@@ -9,6 +9,7 @@ _Einfache AES-Datei-Verschlüsselungs-/-Entschlüsselungsskripte_
 * Encrypt **and** decrypt every file in a folder (recursively) with **AES-256-GCM**.  
 * Password-based key derivation via **Argon2id**.  
 * Stand‑alone binaries can be built with **make / PyInstaller**.
+* Optional flags create EDR test artefacts like the EICAR file or a ransom note.
 
 ### Requirements
 * Python 3.8+  
@@ -37,7 +38,7 @@ Run `make clean` to remove build artefacts.
 
 | Step | Action | Command / Notes |
 |------|--------|-----------------|
-| 1 | **Encrypt** | `python3 encrypt_all.py --path folder` (add `--time`, `--memory`, `--parallelism` if needed)<br>Enter passphrase → key derived via Argon2id<br>Salt & Argon2 params saved to **MOCKBIT_KEY.txt**<br>Original files deleted, encrypted copies end with **.mock** |
+| 1 | **Encrypt** | `python3 encrypt_all.py --path folder` (add `--time`, `--memory`, `--parallelism`, `--ransom-sim`, `--ransom-note` if needed)<br>Enter passphrase → key derived via Argon2id<br>Salt & Argon2 params saved to **MOCKBIT_KEY.txt**<br>Original files deleted, encrypted copies end with **.mock** |
 | 2 | **Decrypt** | `python3 decrypt_all.py --path folder` (same optional parameters)<br>Enter the same passphrase → files are restored, `.mock` files removed |
 
 ### Notes
@@ -57,6 +58,7 @@ Use at your own risk. No liability for data loss or misuse.
 * **AES‑256‑GCM** zum Verschlüsseln **und** Entschlüsseln aller Dateien eines Ordners (inkl. Unterordner).  
 * Passwortbasierte Schlüsselableitung mit **Argon2id**.  
 * Erstellung eigenständiger Binaries per **make / PyInstaller**.
+* Optionale Flags erzeugen EDR-Testdateien wie EICAR oder eine Ransom-Note.
 
 ### Voraussetzungen
 * Python 3.8+  
@@ -85,7 +87,7 @@ Mit `make clean` entfernst du die Build-Dateien.
 
 | Schritt | Aktion | Befehl / Hinweise |
 |---------|--------|-------------------|
-| 1 | **Verschlüsseln** | `python3 encrypt_all.py --path ordner` (optional `--time`, `--memory`, `--parallelism`)<br>Passphrase eingeben → Schlüssel wird via Argon2id abgeleitet<br>Salz & Argon2‑Parameter in **MOCKBIT_KEY.txt**<br>Originale werden sicher gelöscht, verschlüsselte Dateien enden auf **.mock** |
+| 1 | **Verschlüsseln** | `python3 encrypt_all.py --path ordner` (optional `--time`, `--memory`, `--parallelism`, `--ransom-sim`, `--ransom-note`)<br>Passphrase eingeben → Schlüssel wird via Argon2id abgeleitet<br>Salz & Argon2‑Parameter in **MOCKBIT_KEY.txt**<br>Originale werden sicher gelöscht, verschlüsselte Dateien enden auf **.mock** |
 | 2 | **Entschlüsseln** | `python3 decrypt_all.py --path ordner` (gleiche optionale Parameter)<br>Dieselbe Passphrase eingeben → Dateien werden wiederhergestellt, `.mock`‑Dateien entfernt |
 
 ### Hinweise
