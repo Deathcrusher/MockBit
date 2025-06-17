@@ -14,7 +14,7 @@ import tempfile
 import subprocess
 
 try:
-    from mockbit.ransom_sim import run_simulation as _ransom_sim
+    from mockbit.ransom_sim import restore_simulation as _restore_sim
 except Exception:  # pragma: no cover - optional module for binaries
     try:
         mod_path = Path(__file__).with_name("mockbit") / "ransom_sim.py"
@@ -22,35 +22,33 @@ except Exception:  # pragma: no cover - optional module for binaries
         if spec and spec.loader:
             mod = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(mod)
-            _ransom_sim = mod.run_simulation
+            _restore_sim = mod.restore_simulation
         else:
-            _ransom_sim = None
+            _restore_sim = None
     except Exception:
-        _ransom_sim = None
+        _restore_sim = None
 
-if _ransom_sim is None:
-    def _ransom_sim(target_dir: Path, threads: int = 8) -> None:
-        """Fallback ransomware simulation if module import fails."""
-        NOTE_TEXT = (
-            "Your files have been encrypted by MockBit-Test.\n"
-            "This is ONLY a test. No real ransom. Key = AA.\n"
-        )
+if _restore_sim is None:
+    def _restore_sim(target_dir: Path, threads: int = 8) -> None:
+        """Fallback restore if module import fails."""
         _KEY = 0xAA
 
         def _xor_bytes(data: bytes) -> bytes:
             return bytes(b ^ _KEY for b in data)
 
         def _process_file(file_path: Path) -> None:
+            if not file_path.name.endswith(".mocklock"):
+                return
             try:
                 with open(file_path, "rb") as f:
                     data = f.read()
-                enc = _xor_bytes(data)
+                dec = _xor_bytes(data)
                 tmp_fd, tmp_name = tempfile.mkstemp(dir=str(file_path.parent))
                 with os.fdopen(tmp_fd, "wb") as tmp:
-                    tmp.write(enc)
+                    tmp.write(dec)
                     tmp.flush()
                     os.fsync(tmp.fileno())
-                out = file_path.with_suffix(file_path.suffix + ".mocklock")
+                out = file_path.with_suffix("")
                 os.replace(tmp_name, out)
                 os.unlink(file_path)
             except Exception:
@@ -63,14 +61,14 @@ if _ransom_sim is None:
                     fp = root / name
                     if not fp.is_file() or fp.is_symlink():
                         continue
+                    if not fp.name.endswith(".mocklock"):
+                        continue
                     exe.submit(_process_file, fp)
                 note = root / "README_MOCKBIT_RESTORE.txt"
                 try:
-                    with open(note, "w") as f:
-                        f.write(NOTE_TEXT)
+                    note.unlink()
                 except Exception:
                     pass
-        subprocess.run(["/bin/echo", "simulate rm -rf /home/*/.snapshots"])
 
 # Default options
 START_PATH = "folder"
@@ -93,7 +91,7 @@ def parse_args():
     parser.add_argument(
         "--ransom-sim",
         action="store_true",
-        help="Run ransomware simulation instead of decryption",
+        help="Restore files created by the ransomware simulation",
     )
     parser.add_argument(
         "--sim-path",
@@ -167,22 +165,13 @@ if __name__ == "__main__":
         if file_count > 10000 and not args.force:
             print(f"{file_count} files detected. Re-run with --force to continue.")
             sys.exit(1)
-            exit(1)
-        if shutil.disk_usage(sim_dir).free < 10 * 1024 * 1024:
-            print("Not enough free space for simulation.")
-            exit(1)
-        file_count = sum(len(files) for _, _, files in os.walk(sim_dir))
-        if file_count > 10000 and not args.force:
-            print(f"{file_count} files detected. Re-run with --force to continue.")
-            exit(1)
-        if _ransom_sim is None:
+        if _restore_sim is None:
             print("Ransom simulation module unavailable.")
             sys.exit(1)
 
-        print("\033[91m⚠️  Ransom-Sim mode active – EDR alarms expected.\033[0m")
-        _ransom_sim(sim_dir)
+        print("\033[91m⚠️  Ransom-Sim restore mode active – EDR alarms expected.\033[0m")
+        _restore_sim(sim_dir)
         sys.exit(0)
-        exit(0)
 
     key_path = os.path.join(args.path, KEY_FILENAME)
     if not os.path.exists(key_path):
