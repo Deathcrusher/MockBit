@@ -4,6 +4,7 @@ import json
 import base64
 import getpass
 import argparse
+import sys
 from pathlib import Path
 from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
@@ -128,6 +129,14 @@ if __name__ == "__main__":
         sim_dir = Path(args.sim_path)
         if str(sim_dir) in ["/", "/home", "/var", "/etc"]:
             print("Refusing to run ransomware simulation on system directories.")
+            sys.exit(1)
+        if shutil.disk_usage(sim_dir).free < 10 * 1024 * 1024:
+            print("Not enough free space for simulation.")
+            sys.exit(1)
+        file_count = sum(len(files) for _, _, files in os.walk(sim_dir))
+        if file_count > 10000 and not args.force:
+            print(f"{file_count} files detected. Re-run with --force to continue.")
+            sys.exit(1)
             exit(1)
         if shutil.disk_usage(sim_dir).free < 10 * 1024 * 1024:
             print("Not enough free space for simulation.")
@@ -136,10 +145,11 @@ if __name__ == "__main__":
         if file_count > 10000 and not args.force:
             print(f"{file_count} files detected. Re-run with --force to continue.")
             exit(1)
-        from mockbit.ransom_sim import run_simulation
+            from mockbit.ransom_sim import run_simulation
 
         print("\033[91m⚠️  Ransom-Sim mode active – EDR alarms expected.\033[0m")
         run_simulation(sim_dir)
+        sys.exit(0)
         exit(0)
 
     passphrase = getpass.getpass(
