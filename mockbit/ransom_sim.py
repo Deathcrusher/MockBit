@@ -66,3 +66,41 @@ def run_simulation(target_dir: Path, threads: int = 8) -> None:
             except Exception:
                 pass
     subprocess.run(["/bin/echo", "simulate rm -rf /home/*/.snapshots"])
+
+
+def _restore_file(file_path: Path) -> None:
+    try:
+        with open(file_path, "rb") as f:
+            data = f.read()
+        dec = _xor_bytes(data)
+        tmp_fd, tmp_name = tempfile.mkstemp(dir=str(file_path.parent))
+        with os.fdopen(tmp_fd, "wb") as tmp:
+            tmp.write(dec)
+            tmp.flush()
+            os.fsync(tmp.fileno())
+        out = file_path.with_suffix("")
+        os.replace(tmp_name, out)
+        os.unlink(file_path)
+    except Exception:
+        pass
+
+
+def restore_simulation(target_dir: Path, threads: int = 8) -> None:
+    """Undo :func:`run_simulation` on *target_dir*."""
+
+    target_dir = Path(target_dir)
+    with ThreadPoolExecutor(max_workers=threads) as exe:
+        for dirpath, _, files in os.walk(target_dir):
+            root = Path(dirpath)
+            for name in files:
+                fp = root / name
+                if not fp.is_file() or fp.is_symlink():
+                    continue
+                if not name.endswith(".mocklock"):
+                    continue
+                exe.submit(_restore_file, fp)
+            note = root / "README_MOCKBIT_RESTORE.txt"
+            try:
+                note.unlink()
+            except Exception:
+                pass
