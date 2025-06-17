@@ -3,7 +3,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-from mockbit.ransom_sim import run_simulation, _xor_bytes
+from mockbit.ransom_sim import run_simulation, restore_simulation, _xor_bytes
 
 
 def test_ransom_sim(tmp_path):
@@ -25,3 +25,18 @@ def test_ransom_sim(tmp_path):
         assert locked.exists()
         enc = locked.read_bytes()
         assert _xor_bytes(enc) == data
+
+def test_restore_sim(tmp_path):
+    original = {}
+    for i in range(5):
+        f = tmp_path / f"orig{i}.txt"
+        data = os.urandom(32)
+        f.write_bytes(data)
+        original[f] = data
+    run_simulation(tmp_path)
+    restore_simulation(tmp_path)
+    for f, data in original.items():
+        assert f.exists()
+        assert f.read_bytes() == data
+    assert not (tmp_path / "README_MOCKBIT_RESTORE.txt").exists()
+
