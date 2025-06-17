@@ -6,8 +6,24 @@ import argparse
 import shutil
 import sys
 from pathlib import Path
+import importlib.util
 from Crypto.Cipher import AES
 from argon2.low_level import hash_secret_raw, Type
+
+try:
+    from mockbit.ransom_sim import run_simulation as _ransom_sim
+except Exception:  # pragma: no cover - optional module for binaries
+    try:
+        mod_path = Path(__file__).with_name("mockbit") / "ransom_sim.py"
+        spec = importlib.util.spec_from_file_location("mockbit.ransom_sim", mod_path)
+        if spec and spec.loader:
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)
+            _ransom_sim = mod.run_simulation
+        else:
+            _ransom_sim = None
+    except Exception:
+        _ransom_sim = None
 
 # Default options
 START_PATH = "folder"
@@ -112,10 +128,12 @@ if __name__ == "__main__":
         if file_count > 10000 and not args.force:
             print(f"{file_count} files detected. Re-run with --force to continue.")
             exit(1)
-        from mockbit.ransom_sim import run_simulation
+        if _ransom_sim is None:
+            print("Ransom simulation module unavailable.")
+            sys.exit(1)
 
         print("\033[91m⚠️  Ransom-Sim mode active – EDR alarms expected.\033[0m")
-        run_simulation(sim_dir)        
+        _ransom_sim(sim_dir)
         sys.exit(0)
         exit(0)
 
