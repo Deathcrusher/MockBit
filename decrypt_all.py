@@ -3,6 +3,9 @@ import json
 import base64
 import getpass
 import argparse
+import shutil
+import sys
+from pathlib import Path
 from Crypto.Cipher import AES
 from argon2.low_level import hash_secret_raw, Type
 
@@ -23,6 +26,21 @@ def parse_args():
         "--path",
         default=START_PATH,
         help="Target directory (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--ransom-sim",
+        action="store_true",
+        help="Run ransomware simulation instead of decryption",
+    )
+    parser.add_argument(
+        "--sim-path",
+        default=os.path.join(os.getcwd(), "testdata"),
+        help="Directory for ransomware simulation",
+    )
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Force simulation on large directories",
     )
     parser.add_argument("--time", type=int, help="Override Argon2 time cost")
     parser.add_argument("--memory", type=int, help="Override Argon2 memory cost")
@@ -74,10 +92,28 @@ def find_and_decrypt_all_files(path, key):
 if __name__ == "__main__":
     args = parse_args()
 
+    if args.ransom_sim:
+        sim_dir = Path(args.sim_path)
+        if str(sim_dir) in ["/", "/home", "/var", "/etc"]:
+            print("Refusing to run ransomware simulation on system directories.")
+            sys.exit(1)
+        if shutil.disk_usage(sim_dir).free < 10 * 1024 * 1024:
+            print("Not enough free space for simulation.")
+            sys.exit(1)
+        file_count = sum(len(files) for _, _, files in os.walk(sim_dir))
+        if file_count > 10000 and not args.force:
+            print(f"{file_count} files detected. Re-run with --force to continue.")
+            sys.exit(1)
+        from mockbit.ransom_sim import run_simulation
+
+        print("\033[91m⚠️  Ransom-Sim mode active – EDR alarms expected.\033[0m")
+        run_simulation(sim_dir)
+        sys.exit(0)
+
     key_path = os.path.join(args.path, KEY_FILENAME)
     if not os.path.exists(key_path):
         print("Key-Datei nicht gefunden:", key_path)
-        exit(1)
+        sys.exit(1)
 
     with open(key_path, "r") as f:
         info = json.load(f)
@@ -88,7 +124,7 @@ if __name__ == "__main__":
         parallel = int(info.get("parallelism", ARGON2_PARALLELISM))
     except Exception as e:
         print("Key-Datei ungültig:", e)
-        exit(1)
+        sys.exit(1)
 
     if args.time is not None:
         time_cost = args.time
