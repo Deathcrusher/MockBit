@@ -5,7 +5,8 @@ ENCRYPT_OUT=$(BIN_DIR)/encrypt
 DECRYPT_OUT=$(BIN_DIR)/decrypt
 PYI_OPTS=--onefile --distpath $(BIN_DIR) \
         --hidden-import=Crypto --hidden-import=Crypto.Random \
-        --hidden-import=Crypto.Cipher --hidden-import=argon2
+        --hidden-import=Crypto.Cipher --hidden-import=argon2 \
+        --hidden-import=mockbit.ransom_sim
 
 all: $(ENCRYPT_OUT) $(DECRYPT_OUT)
 

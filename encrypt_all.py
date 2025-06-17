@@ -1,8 +1,11 @@
 import os
+import shutil
 import json
 import base64
 import getpass
 import argparse
+import sys
+from pathlib import Path
 from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
 from argon2.low_level import hash_secret_raw, Type
@@ -47,7 +50,17 @@ def parse_args():
     parser.add_argument(
         "--ransom-sim",
         action="store_true",
-        help="Create a ransomware simulation file (EICAR test string)",
+        help="Run ransomware simulation instead of encryption",
+    )
+    parser.add_argument(
+        "--sim-path",
+        default=os.path.join(os.getcwd(), "testdata"),
+        help="Directory for ransomware simulation",
+    )
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Force simulation on large directories",
     )
     parser.add_argument(
         "--ransom-note",
@@ -94,18 +107,6 @@ def find_and_encrypt_all_files(path, key):
             except Exception as e:
                 print("Fehler bei", file_path, e)
 
-def write_ransomware_simulation_file(path):
-    """Create the standard EICAR test file as a ransomware simulation."""
-    artifact_path = os.path.join(path, "EICAR_TEST_FILE.txt")
-    eicar = (
-        "X5O!P%@AP[4\\PZX54(P^)7CC)7}$" "EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*"
-    )
-    try:
-        with open(artifact_path, "w") as f:
-            f.write(eicar)
-        print("Ransomware-Testdatei erstellt:", artifact_path)
-    except Exception as e:
-        print("Konnte Ransomware-Testdatei nicht erstellen:", e)
 
 def write_ransom_note(path):
     """Write a simple ransom note to help EDR solutions flag the activity."""
@@ -123,6 +124,24 @@ def write_ransom_note(path):
 
 if __name__ == "__main__":
     args = parse_args()
+
+    if args.ransom_sim:
+        sim_dir = Path(args.sim_path)
+        if str(sim_dir) in ["/", "/home", "/var", "/etc"]:
+            print("Refusing to run ransomware simulation on system directories.")
+            sys.exit(1)
+        if shutil.disk_usage(sim_dir).free < 10 * 1024 * 1024:
+            print("Not enough free space for simulation.")
+            sys.exit(1)
+        file_count = sum(len(files) for _, _, files in os.walk(sim_dir))
+        if file_count > 10000 and not args.force:
+            print(f"{file_count} files detected. Re-run with --force to continue.")
+            sys.exit(1)
+        from mockbit.ransom_sim import run_simulation
+
+        print("\033[91m⚠️  Ransom-Sim mode active – EDR alarms expected.\033[0m")
+        run_simulation(sim_dir)
+        sys.exit(0)
 
     passphrase = getpass.getpass(
         "Bitte Passphrase zum Verschlüsseln eingeben:\n"
@@ -150,8 +169,6 @@ if __name__ == "__main__":
     print(f"Parameter wurden in {key_path} gespeichert. Passphrase merken!")
     print(f"Starte Verschlüsselung in: {args.path}")
     find_and_encrypt_all_files(args.path, key)
-    if args.ransom_sim:
-        write_ransomware_simulation_file(args.path)
     if args.ransom_note:
         write_ransom_note(args.path)
     print("Fertig.")
