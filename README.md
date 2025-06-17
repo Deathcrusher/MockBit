@@ -98,3 +98,42 @@ Mit `make clean` entfernst du die Build-Dateien.
 
 ### Haftungsausschluss
 Benutzung auf eigene Gefahr. Keine Haftung für Datenverlust oder Missbrauch.
+
+## Unity Screenshot Example
+
+The `UnityExamples/ScreenshotUploader.cs` script demonstrates how to capture a screenshot in Unity and upload it to a server. Set `uploadUrl` to your MCP endpoint and `llmUrl` if a language model should receive the screenshot. The script can:
+
+1. **Capture & Upload Screenshot** – send the image to `uploadUrl`.
+2. **Capture & Send To LLM Directly** – post straight to `llmUrl`.
+3. **Capture & Forward via MCP** – upload to `uploadUrl` and include `llmUrl` in the form so your MCP server can forward it to the requesting LLM.
+
+If `autoSendOnStart` is enabled on the component, the screenshot will be captured
+and forwarded automatically when the scene starts, giving the LLM immediate
+visual context.
+
+The example uses `UnityWebRequest` and logs the server response. Tools typically rely on a similar HTTP request from the client and let the MCP handle forwarding to an LLM. Direct integration with GitHub Copilot isn't possible, but this pattern allows your own backend or LLM service to analyze the project.
+
+### Simple MCP Forwarding Server
+
+Use `MCPExamples/screenshot_forward_server.py` as a lightweight MCP endpoint. It
+accepts a screenshot via `POST /upload` and forwards the image to the given
+`forward_url`. If none is provided, it checks the environment variable
+`DEFAULT_FORWARD_URL` so screenshots can be automatically sent to a fixed LLM
+endpoint.
+
+```bash
+pip install -r requirements.txt
+python3 MCPExamples/screenshot_forward_server.py
+```
+
+Set `DEFAULT_FORWARD_URL` before starting the server if you want every
+uploaded screenshot to be forwarded automatically:
+
+```bash
+export DEFAULT_FORWARD_URL="https://my-llm-server.example/upload"
+python3 MCPExamples/screenshot_forward_server.py
+```
+
+Point `uploadUrl` in `ScreenshotUploader` to `http://localhost:8000/upload` and
+set `llmUrl` to the `forward_url` provided by the MCP. This mirrors how other
+tools return data to the chat that triggered them.

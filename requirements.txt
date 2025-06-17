@@ -1,2 +1,4 @@
 pycryptodome
 argon2-cffi
+Flask
+requests
