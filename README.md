@@ -50,6 +50,9 @@ Run `make clean` to remove build artefacts.
 ### Disclaimer
 Use at your own risk. No liability for data loss or misuse.
 
+### 🧪 Ransomware-Simulation Mode
+Enable via `--ransom-sim` and optional `--sim-path` (defaults to `./testdata`). The tool XOR-encrypts files to `<name>.mocklock`, writes a ransom note and echoes a fake backup wipe. This helps EDR or XDR solutions detect malicious activity. The encryption key is always 0xAA so data can be restored. Run only in disposable test directories.
+
 ---
 
 ## Deutsch
