@@ -58,6 +58,36 @@ Enable via `--ransom-sim` and optional `--sim-path` (defaults to `./testdata`). 
 on *folder*. This makes it easy for EDR solutions to spot malicious behaviour.
 Execute only in safe test environments.
 
+#### Triggering the payload remotely (example)
+
+If you manage the test machine from a central controller, you can point the
+payload at a specific directory through an environment variable and run it over
+SSH. The controller only forwards the command; **the encryption routine runs on
+the victim host** because the shell opened by `ssh` executes there. You can
+verify this by prefacing the command with `hostname`—the printed name will be
+the victim, not the controller.
+
+```bash
+TARGET_DIR=/safe/test/directory
+ssh edr-lab "hostname && TARGET_DIR=$TARGET_DIR python3 -m mockbit.linux_payload --path \"$TARGET_DIR\""
+```
+
+The `TARGET_DIR` variable is expanded by the remote shell, so the victim system
+receives the correct path and encrypts only that directory in simulation mode.
+Adjust usernames, hostnames, and the folder path to match your lab setup.
+
+Alternatively, log on to the victim machine (via SSH or console), export the
+target directory locally, and run the payload directly to ensure the
+instrumentation sees the activity as originating from that host:
+
+```bash
+ssh edr-lab
+export TARGET_DIR=/safe/test/directory
+python3 -m mockbit.linux_payload --path "$TARGET_DIR"
+```
+
+Both workflows execute the payload entirely on the victim.
+
 ---
 
 ## Deutsch
